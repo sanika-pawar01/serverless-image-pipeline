@@ -18,6 +18,17 @@ def process_image(input_path, output_dir):
     image.save(output_path, format="JPEG")
     print(f"Saved processed image to {output_path}")
 
+def main():
+    with open("changed_files.txt", "r") as f:
+        files = [line.strip() for line in f if line.strip()]
+
+    if not files:
+        print("No new images to process.")
+        return
+
+    for file in files:
+        print(f"Processing: {file}")
+        process_image(file, "processed")
+
 if __name__ == "__main__":
-    input_file = sys.argv[1]
-    process_image(input_file, "processed")
+    main()
