@@ -26,11 +26,8 @@ jobs:
 
       - name: Find and process new images
         run: |
-          files=$(git diff --name-only HEAD^ HEAD -- 'uploads/*.jpg' 'uploads/*.jpeg' 'uploads/*.png')
-          for file in $files; do
-            echo "Processing: $file"
-            python scripts/process_image.py "$file"
-          done
+          git diff --name-only HEAD^ HEAD -- 'uploads/*.jpg' 'uploads/*.jpeg' 'uploads/*.png' > changed_files.txt while IFS= read -r file; 
+          do [ -z "$file" ] && continue echo "Processing: $file" python scripts/process_image.py "$file" done < changed_files.txt
 
       - name: Commit processed image back
         run: |
