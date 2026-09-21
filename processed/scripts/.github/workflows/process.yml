@@ -1,0 +1,41 @@
+name: Image Processing Pipeline
+
+on:
+  push:
+    paths:
+      - 'uploads/**'
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install Pillow
+
+      - name: Find and process new images
+        run: |
+          files=$(git diff --name-only HEAD^ HEAD -- 'uploads/*.jpg' 'uploads/*.jpeg' 'uploads/*.png')
+          for file in $files; do
+            echo "Processing: $file"
+            python scripts/process_image.py "$file"
+          done
+
+      - name: Commit processed image back
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add processed/
+          git commit -m "Auto-process uploaded image" || echo "Nothing to commit"
+          git push
