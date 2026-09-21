@@ -15,24 +15,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
       - name: Install dependencies
         run: pip install Pillow
-
-      - name: Find and process new images
-        run: |
-          git diff --name-only HEAD^ HEAD -- 'uploads/*.jpg' 'uploads/*.jpeg' 'uploads/*.png' > changed_files.txt while IFS= read -r file; 
-          do [ -z "$file" ] && continue echo "Processing: $file" python scripts/process_image.py "$file" done < changed_files.txt
-
+      - name: List changed images
+        run: git diff --name-only HEAD^ HEAD -- 'uploads/*.jpg' 'uploads/*.jpeg' 'uploads/*.png' > changed_files.txt
+      - name: Process images
+        run: python scripts/process_image.py
+      - name: Configure git identity
+        run: git config user.name "github-actions[bot]" && git config user.email "github-actions[bot]@users.noreply.github.com"
       - name: Commit processed image back
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add processed/
-          git commit -m "Auto-process uploaded image" || echo "Nothing to commit"
-          git push
+        run: git add processed/ && git commit -m "Auto-process uploaded image" --allow-empty-message || echo "Nothing to commit"
+      - name: Push changes
+        run: git push
