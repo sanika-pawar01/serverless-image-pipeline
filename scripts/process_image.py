@@ -11,7 +11,7 @@ def process_image(input_path, output_dir):
     print(f"Metadata -> Name: {filename}, Size: {width}x{height}, Format: {fmt}")
 
     draw = ImageDraw.Draw(image)
-    draw.text((20, height - 40), "CONFIDENTIAL - DEMO", fill=(255, 0, 0))
+    draw.text((20, height - 40), "GPP-confidential", fill=(255, 0, 0))
 
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, f"processed_{filename}")
